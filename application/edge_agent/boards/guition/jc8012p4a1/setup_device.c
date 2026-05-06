@@ -6,12 +6,16 @@
 #include <string.h>
 #include "esp_log.h"
 #include "dev_display_lcd.h"
-#include "esp_lcd_ek79007.h"
+#include "esp_lcd_panel_io.h"
+#include "esp_lcd_panel_ops.h"
+#include "esp_lcd_mipi_dsi.h"
+#include "esp_lcd_jd9365.h"
 // #include "esp_lcd_touch_gt911.h"
+#include "esp_lcd_touch_gsl3680.h"
 
 static const char *TAG = "P4_FUNCTION_EV_SETUP_DEVICE";
 
-static const ek79007_lcd_init_cmd_t lcd_cmd[] = {
+static const jd9365_lcd_init_cmd_t lcd_cmd[] = {
 //  {cmd, { data }, data_size, delay_ms}
     {0xE0, (uint8_t[]){0x00}, 1, 0},
     {0xE1, (uint8_t[]){0x93}, 1, 0},
@@ -253,9 +257,9 @@ static const ek79007_lcd_init_cmd_t lcd_cmd[] = {
 };
 esp_err_t lcd_dsi_panel_factory_entry_t(esp_lcd_dsi_bus_handle_t dsi_handle, dev_display_lcd_config_t *lcd_cfg, dev_display_lcd_handles_t *lcd_handles)
 {
-    ek79007_vendor_config_t vendor_config = {
+    jd9365_vendor_config_t vendor_config = {
         .init_cmds = lcd_cmd,
-        .init_cmds_size = sizeof(lcd_cmd) / sizeof(ek79007_lcd_init_cmd_t),
+        .init_cmds_size = sizeof(lcd_cmd) / sizeof(jd9365_lcd_init_cmd_t),
         .mipi_config = {
             .dsi_bus = dsi_handle,
             .dpi_config = &lcd_cfg->sub_cfg.dsi.dpi_config,
@@ -273,22 +277,28 @@ esp_err_t lcd_dsi_panel_factory_entry_t(esp_lcd_dsi_bus_handle_t dsi_handle, dev
         .vendor_config = &vendor_config,
     };
 
-    esp_err_t ret = esp_lcd_new_panel_ek79007(lcd_handles->io_handle, &lcd_dev_config, &lcd_handles->panel_handle);
+    esp_err_t ret = esp_lcd_new_panel_jd9365(lcd_handles->io_handle, &lcd_dev_config, &lcd_handles->panel_handle);
     if (ret != ESP_OK) {
-        ESP_LOGE(TAG, "Failed to create ek79007 panel: %s", esp_err_to_name(ret));
+        ESP_LOGE(TAG, "Failed to create jd9365 panel: %s", esp_err_to_name(ret));
         return ESP_FAIL;
     }
+
+    // ret = esp_lcd_panel_mirror(lcd_handles->panel_handle, true, true);
+    // esp_lcd_panel_reset(lcd_handles->panel_handle);
+    // esp_lcd_panel_init(lcd_handles->panel_handle);
+    // esp_lcd_panel_mirror(lcd_handles->panel_handle, true, true);
+
 
     return ESP_OK;
 }
 
-// esp_err_t lcd_touch_factory_entry_t(esp_lcd_panel_io_handle_t io, const esp_lcd_touch_config_t *touch_dev_config, esp_lcd_touch_handle_t *ret_touch)
-// {
-    // esp_err_t ret = esp_lcd_touch_new_i2c_gt911(io, touch_dev_config, ret_touch);
-    // if (ret != ESP_OK) {
-    //     ESP_LOGE("lcd_touch_factory_entry_t", "Failed to create gt911 touch driver: %s", esp_err_to_name(ret));
-    //     return ret;
-    // }
+esp_err_t lcd_touch_factory_entry_t(esp_lcd_panel_io_handle_t io, const esp_lcd_touch_config_t *touch_dev_config, esp_lcd_touch_handle_t *ret_touch)
+{
+    esp_err_t ret = esp_lcd_touch_new_i2c_gsl3680(io, touch_dev_config, ret_touch);
+    if (ret != ESP_OK) {
+        ESP_LOGE("lcd_touch_factory_entry_t", "Failed to create gt911 touch driver: %s", esp_err_to_name(ret));
+        return ret;
+    }
 
-//     return ESP_OK;
-// }
+    return ESP_OK;
+}
