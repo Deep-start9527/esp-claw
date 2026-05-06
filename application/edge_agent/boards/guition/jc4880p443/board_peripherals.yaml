@@ -65,7 +65,7 @@ peripherals:
       bus_id: 0
       data_lanes: 2
       phy_clk_src: 0
-      lane_bit_rate_mbps: 750
+      lane_bit_rate_mbps: 550
 
   # Backlight Control
   - name: ledc_backlight

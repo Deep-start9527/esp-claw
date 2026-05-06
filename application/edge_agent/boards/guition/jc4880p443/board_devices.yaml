@@ -74,13 +74,13 @@ devices:
 
   # DSI Display Device
   - name: display_lcd
-    chip: ek79007
+    chip: st7701s
     type: display_lcd
     sub_type: dsi
     dependencies:
-      espressif/esp_lcd_ek79007: "^1.0.0"
+      espressif/esp_lcd_st7701: "^2.0.2"
     config:
-      reset_gpio_num: 0
+      reset_gpio_num: 5
       rgb_ele_order: LCD_RGB_ELEMENT_ORDER_RGB
       data_endian: LCD_RGB_DATA_ENDIAN_LITTLE
       bits_per_pixel: 24
@@ -108,7 +108,7 @@ devices:
           hsync_front_porch : 42
           vsync_back_porch : 8
           vsync_pulse_width : 2
-          vsync_front_porch : 12166
+          vsync_front_porch : 166
       peripherals:
       - name: ldo_mipi
       - name: dsi_display

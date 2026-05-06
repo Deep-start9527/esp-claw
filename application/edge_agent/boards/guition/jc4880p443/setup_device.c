@@ -6,12 +6,12 @@
 #include <string.h>
 #include "esp_log.h"
 #include "dev_display_lcd.h"
-#include "esp_lcd_ek79007.h"
+#include "esp_lcd_st7701.h"
 #include "esp_lcd_touch_gt911.h"
 
 static const char *TAG = "P4_FUNCTION_EV_SETUP_DEVICE";
 
-static const ek79007_lcd_init_cmd_t lcd_cmd[] = {
+static const st7701_lcd_init_cmd_t lcd_cmd[] = {
 //  {cmd, { data }, data_size, delay_ms}
     {0xFF, (uint8_t []){0x77,0x01,0x00,0x00,0x13},5,0},
     {0xEF, (uint8_t []){0x08}, 1, 0},
@@ -63,9 +63,10 @@ static const ek79007_lcd_init_cmd_t lcd_cmd[] = {
 };
 esp_err_t lcd_dsi_panel_factory_entry_t(esp_lcd_dsi_bus_handle_t dsi_handle, dev_display_lcd_config_t *lcd_cfg, dev_display_lcd_handles_t *lcd_handles)
 {
-    ek79007_vendor_config_t vendor_config = {
+    st7701_vendor_config_t vendor_config = {
         .init_cmds = lcd_cmd,
-        .init_cmds_size = sizeof(lcd_cmd) / sizeof(ek79007_lcd_init_cmd_t),
+        .init_cmds_size = sizeof(lcd_cmd) / sizeof(st7701_lcd_init_cmd_t),
+        .flags.use_mipi_interface = 1,
         .mipi_config = {
             .dsi_bus = dsi_handle,
             .dpi_config = &lcd_cfg->sub_cfg.dsi.dpi_config,
@@ -83,7 +84,7 @@ esp_err_t lcd_dsi_panel_factory_entry_t(esp_lcd_dsi_bus_handle_t dsi_handle, dev
         .vendor_config = &vendor_config,
     };
 
-    esp_err_t ret = esp_lcd_new_panel_ek79007(lcd_handles->io_handle, &lcd_dev_config, &lcd_handles->panel_handle);
+    esp_err_t ret = esp_lcd_new_panel_st7701(lcd_handles->io_handle, &lcd_dev_config, &lcd_handles->panel_handle);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to create ek79007 panel: %s", esp_err_to_name(ret));
         return ESP_FAIL;
