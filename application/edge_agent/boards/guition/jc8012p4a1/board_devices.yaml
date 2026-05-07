@@ -123,6 +123,8 @@ devices:
   #       version: "*"
   #       require: public
   #     espressif/esp_lcd_touch_gt911: "*"
+  #     esp_lcd_gsl3680:
+  #       path: ../../components/esp_lcd_touch_gsl3680
   #   config:
   #     # esp_lcd_panel_io_i2c_config_t fields for touch communication
   #     io_i2c_config:
